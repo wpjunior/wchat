@@ -26,7 +26,7 @@ Controller.prototype = {
         var date = new Date(),
         dateStr = date.getHours()+':'+date.getMinutes()+':'+date.getSeconds();
         var msg = {
-            from: this.to,
+            from: this.from,
             msg: msg,
             date: dateStr
         };
