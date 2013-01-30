@@ -2,6 +2,22 @@ var ChatManager = function () {
     var that = this;
     this.msgTpl = _.template($('#msg-tpl').text());
 
+    createjs.FlashPlugin.BASE_PATH = "/soundjs/" // Initialize the base path from this document to the Flash Plugin
+    if (!createjs.SoundJS.checkPlugin(true)) {
+        alert('error')
+	document.getElementById("error").style.display = "block";
+	document.getElementById("content").style.display = "none";
+	return;
+    }
+
+    var manifest = [
+	{src: "/sound/chat.mp3", id:1, data: 1},
+    ];
+
+    preload = new createjs.PreloadJS();
+    preload.installPlugin(createjs.SoundJS);
+    preload.loadManifest(manifest, true);
+
     $('#start-btn').click(function (e) {
         e.preventDefault();
         that.startChat();
@@ -64,6 +80,8 @@ ChatManager.prototype = {
         $("#messages").animate({
             scrollTop: $("#messages")[0].scrollHeight
         }, 2000);
+
+        createjs.SoundJS.play(1, createjs.SoundJS.INTERRUPT_NONE, 0, 0, false, 1);
     },
     getMessages: function () {
         var that = this;
