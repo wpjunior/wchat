@@ -2,11 +2,14 @@ var ChatManager = function () {
     var that = this;
     this.msgTpl = _.template($('#msg-tpl').text());
 
+    if (window.localStorage) {
+        $('#from').val(window.localStorage.getItem('from'));
+        $('#to').val(window.localStorage.getItem('to'));
+    }
+
     createjs.FlashPlugin.BASE_PATH = "/soundjs/" // Initialize the base path from this document to the Flash Plugin
     if (!createjs.SoundJS.checkPlugin(true)) {
-        alert('error')
-	document.getElementById("error").style.display = "block";
-	document.getElementById("content").style.display = "none";
+        alert('sound error')
 	return;
     }
 
@@ -60,14 +63,24 @@ ChatManager.prototype = {
             to: this.to
         });
 
+        this.socket.on('disconnect', function (){
+            createjs.SoundJS.play(1, createjs.SoundJS.INTERRUPT_NONE, 0, 0, false, 1);
+            alert("Erro na comunicação, recarregue a página");
+        });
+
         this.socket.on('msg', function (data) {
             that.drawMsg(data);
         });
 
         $('#start').addClass('hide');
         $('#chat').removeClass('hide');
-        //TODO: arquivar em cache do navegador o from e o to
 
+        //arquiva em cache do navegador o from e o to
+        if (window.localStorage) {
+            window.localStorage.setItem('from', this.from);
+            window.localStorage.setItem('to', this.to);
+        }
+        
         $("#persons").text("Chat entre "+this.from+" e "+this.to);
 
         this.getMessages();
