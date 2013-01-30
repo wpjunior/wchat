@@ -44,6 +44,15 @@ app.get('/', function(req, res) {
 var server = http.createServer(app),
 io = require('socket.io').listen(server);
 
+io.configure(function (){
+  io.set('authorization', function (handshakeData, callback) {
+      if (handshakeData.query.password == '1727')
+          callback(null, true);
+      else
+          callback(null, false);
+  });
+});
+
 io.sockets.on('connection', function (socket) {
     var ctl = new controller.Controller(io, socket);
 });

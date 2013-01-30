@@ -1,6 +1,7 @@
 var ChatManager = function () {
     var that = this;
-    this.msgTpl = _.template($('#msg-tpl').text());
+    this.fromMsgTpl = _.template($('#from-msg-tpl').text());
+    this.toMsgTpl = _.template($('#to-msg-tpl').text());
 
     if (window.localStorage) {
         $('#from').val(window.localStorage.getItem('from'));
@@ -15,6 +16,9 @@ var ChatManager = function () {
 
     var manifest = [
 	{src: "/sound/chat.mp3", id:1, data: 1},
+	{src: "/sound/login.mp3", id:2, data: 1},
+	{src: "/sound/logout.mp3", id:3, data: 1},
+	{src: "/sound/error.mp3", id:4, data: 1}
     ];
 
     preload = new createjs.PreloadJS();
@@ -52,24 +56,42 @@ ChatManager.prototype = {
         this.from = $('#from').val();
         this.to = $('#to').val();
 
+        var password = $("#password").val();
+
+        if (!password) {
+            alert("A senha é obrigatório")
+            return;
+        }
+            
+
         if ((!this.from)||(!this.to)) {
             alert("Preencha todos os campos");
             return;
         }
 
-        this.socket = io.connect(window.location.toString());
+        this.socket = io.connect(window.location.toString()+'?password='+password);
         this.socket.emit('login', {
             from: this.from,
             to: this.to
         });
 
+        this.socket.on('error', function (){
+            createjs.SoundJS.play(4, createjs.SoundJS.INTERRUPT_NONE, 0, 0, false, 1);
+            alert("Erro na comunicação, a senha pode estar incorreta");
+            window.location = '/';
+        });
+
         this.socket.on('disconnect', function (){
-            createjs.SoundJS.play(1, createjs.SoundJS.INTERRUPT_NONE, 0, 0, false, 1);
+            createjs.SoundJS.play(4, createjs.SoundJS.INTERRUPT_NONE, 0, 0, false, 1);
             alert("Erro na comunicação, recarregue a página");
         });
 
         this.socket.on('msg', function (data) {
             that.drawMsg(data);
+        });
+
+        this.socket.on('status', function (data) {
+            that.setStatus(data.status);
         });
 
         $('#start').addClass('hide');
@@ -87,7 +109,11 @@ ChatManager.prototype = {
         
     },
     drawMsg: function (data) {
-        var html = this.msgTpl(data);
+        if (data.from == this.from)
+            var html = this.fromMsgTpl(data);
+        else
+            var html = this.toMsgTpl(data);
+
         $('#messages').append(html);
 
         $("#messages").animate({
@@ -107,7 +133,11 @@ ChatManager.prototype = {
     },
     drawMessages: function (messages) {
         for (var i=messages.length-1; i>=0; i--) {
-            var html = this.msgTpl(messages[i]);
+            if (messages[i].from == this.from)
+                var html = this.fromMsgTpl(messages[i]);
+            else
+                var html = this.toMsgTpl(messages[i]);
+
             $('#messages').append(html);
         }
         
@@ -115,6 +145,15 @@ ChatManager.prototype = {
             scrollTop: $("#messages")[0].scrollHeight
         }, 2000);
         
+    },
+    setStatus: function(status) {
+        if (status) {
+            $('#status').text(this.to+' está online');
+            createjs.SoundJS.play(2, createjs.SoundJS.INTERRUPT_NONE, 0, 0, false, 1);
+        } else {
+            $('#status').text(this.to+' está offline');
+            createjs.SoundJS.play(3, createjs.SoundJS.INTERRUPT_NONE, 0, 0, false, 1);
+        }
     }
 };
 

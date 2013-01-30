@@ -11,13 +11,25 @@ var Controller = function (io, socket) {
     this.socket.on('login', function (data) {
         that.from = data.from;
         that.to = data.to;
-
         that.socket.join(that.from);
+
+        if (that.io.sockets.clients(that.to).length)
+            that.socket.emit('status', {status: true});
+        else
+            that.socket.emit('status', {status: false});
+
+        that.io.sockets.in(that.to).emit('status', {status: true});
     });
 
     this.socket.on('msg', function (data) {
         that.processMsg(data.msg);
     });
+
+    this.socket.on('disconnect', function () {
+        that.io.sockets.in(that.to).emit('status', {status: false});
+    });
+
+    
 };
 
 Controller.prototype = {

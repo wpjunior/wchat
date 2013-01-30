@@ -26,17 +26,18 @@
 	  <div id="music-loader"></div>
 	  <div class="container">
 		  <div class="page-header">
-			  <h4>WChat *-*</h4>
+			  <h4>I..W Chat</h4>
 		  </div>
 
 		  <h5 id="persons"></h5>
+		  <div id="status"></div>
 
 		  <div id="start" class="form-inline">
-			  <input id="from" type="text" placeholder="De" />
-			  <input id="to" type="text" placeholder="Para" />
-			  <a id="start-btn" class="btn btn-primary">
+			  <input id="from" type="text" placeholder="De" class="input-small" />
+			  <input id="to" type="text" placeholder="Para" class="input-small" />
+			  <input id="password" type="password" placeholder="Senha" class="input-mini" />
+			  <a id="start-btn" class="btn btn-danger">
 				  <i class="icon-white icon-heart"></i>
-				  Iniciar conversação
 			  </a>
 		  </div>
 
@@ -44,11 +45,14 @@
 			  <div id="messages"></div>
 			  
 			  <div id="new-message" class="form-inline">
-				  <input id="msg" type="text" placeholder="Mensagem"></input>
-				  <a id="send-msg" class="btn btn-primary">
-					  <i class="icon-white icon-heart"></i>
-					  Enviar mensagem
-				  </a>
+			      <div class="input-append">
+                    <input id="msg" type="text" placeholder="Mensagem" class="input-xlarge"></input>
+                    <a id="send-msg" class="btn btn-danger">
+					   <i class="icon-white icon-heart"></i>
+				     </a>
+                  </div>
+				  
+				  
 			  </div>
 		  </div>
 	  </div>
@@ -57,7 +61,7 @@
 		  <div class="footer">
 			  <div class="span6">
 				  <span class="copyright">
-					  ©2013 Wilson Júnior e Isabella Luanna
+					  Isabella Luanna <i class="icon-heart"></i> Wilson Júnior
 				  </span>
 			  </div>
 			  <div class="span6">
@@ -69,8 +73,14 @@
       </div>
 
 	  <div class="templates">
-		  <script id="msg-tpl" type="text/html">
+		  <script id="from-msg-tpl" type="text/html">
 			  <div class="alert alert-info">
+				  <b><%= from %></b> - <i><%= date %></i><br/>
+				  <%= msg %>
+			  </div>
+		  </script>
+		  <script id="to-msg-tpl" type="text/html">
+			  <div class="alert alert-danger">
 				  <b><%= from %></b> - <i><%= date %></i><br/>
 				  <%= msg %>
 			  </div>
