@@ -9,7 +9,7 @@
         "express": "3.0.3",
         "jade": "*",
         "mongoose": "*",
-        "socket.io": "*",
+        "socket.io": "0.9",
         "ejs": "*"
     }
 }
